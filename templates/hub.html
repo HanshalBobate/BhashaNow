@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BhashaNow - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #84fab0, #8fd3f4);
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
+        }
+        #particle-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        .glass-bg {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        .action-card {
+             background: rgba(255, 255, 255, 0.2);
+             border: 1px solid rgba(255, 255, 255, 0.1);
+             transition: transform 0.3s ease-out, box-shadow 0.3s ease-out, background 0.3s ease-out;
+        }
+        .action-card:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+         .font-brand {
+            font-family: 'Poppins', sans-serif;
+        }
+        .sidebar-link {
+            transition: background 0.2s, color 0.2s, padding-left 0.2s;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            background-color: rgba(255,255,255,0.2);
+            padding-left: 1.25rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <canvas id="particle-canvas"></canvas>
+    
+    <div class="flex h-screen bg-transparent">
+        <!-- Sidebar -->
+        <aside class="w-64 flex-shrink-0 p-4 hidden md:flex flex-col">
+            <div class="flex-grow glass-bg rounded-2xl flex flex-col p-4">
+                <a href="hub.html" class="flex items-center space-x-2 px-2 pb-4 border-b border-white/20">
+                    <img src="{{ url_for('static', filename='img.png') }}" alt="BhashaNow Logo" class="w-10 h-10 rounded-lg">
+                    <span class="text-xl font-bold text-gray-800 font-brand">BhashaNow</span>
+                </a>
+                <nav class="mt-8 space-y-2">
+                    <a href="hub" class="sidebar-link active flex items-center gap-3 py-2 px-4 rounded-lg text-gray-800 font-semibold">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                        Dashboard
+                    </a>
+                    <a href="userprofile" class="sidebar-link flex items-center gap-3 py-2 px-4 rounded-lg text-gray-800 font-semibold">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        Profile
+                    </a>
+                </nav>
+                <div class="mt-auto">
+                    <a href="logout" class="sidebar-link flex items-center gap-3 py-2 px-4 rounded-lg text-gray-800 font-semibold">
+                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        Log Out
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-4 flex flex-col">
+            <div class="flex-grow glass-bg rounded-2xl p-6 md:p-8 flex flex-col">
+                <!-- Header -->
+                <header class="flex-shrink-0">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h1 id="welcome-header" class="text-3xl font-bold text-gray-800">Welcome, {{user.name|capitalize }}!</h1>
+                            <p id="date-display" class="text-gray-700 mt-1"></p>
+                        </div>
+                        <a href="userprofile" title="View Profile" class="md:hidden">
+                            <img class="w-12 h-12 rounded-full border-2 border-orange-500 object-cover" src="https://placehold.co/100x100/f97316/FFFFFF?text=A" alt="User Avatar">
+                        </a>
+                    </div>
+                </header>
+
+                <!-- Quick Actions -->
+                <section class="mt-8">
+                    <h2 class="text-2xl font-semibold text-gray-800">Quick Actions</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                        <a href="camera" class="action-card rounded-xl p-6 flex items-center gap-4">
+                            <div class="bg-orange-100 p-3 rounded-full"><svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div>
+                            <div>
+                                <h3 class="font-bold text-lg text-gray-800">Use Camera</h3>
+                                <p class="text-sm text-gray-700">Transliterate from an image.</p>
+                            </div>
+                        </a>
+                        <a href="text-transliteration" class="action-card rounded-xl p-6 flex items-center gap-4">
+                            <div class="bg-blue-100 p-3 rounded-full"><svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg></div>
+                             <div>
+                                <h3 class="font-bold text-lg text-gray-800">Enter Text</h3>
+                                <p class="text-sm text-gray-700">Type or paste text to transliterate.</p>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+                
+                <!-- Map Section -->
+                <section class="mt-8 flex-grow flex flex-col">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-2xl font-semibold text-gray-800">Explore Nearby</h2>
+                         <button onclick="getLocation()" class="text-sm bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors">Recenter Map</button>
+                    </div>
+                     <p id="location-info" class="text-gray-700 text-sm mt-1">Requesting location...</p>
+                    <div id="map" class="mt-4 flex-grow rounded-xl overflow-hidden relative border border-white/20 min-h-[300px]"></div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dateDisplay = document.getElementById('date-display');
+            if (dateDisplay) {
+                const today = new Date();
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                dateDisplay.textContent = today.toLocaleDateString('en-US', options);
+            }
+
+            const locationInfo = document.getElementById('location-info');
+            let map;
+            let userMarker;
+            let landmarkLayer = L.layerGroup();
+            let userCoords = { lat: 21.1458, lon: 79.0882 };
+
+            map = L.map('map').setView([userCoords.lat, userCoords.lon], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+            landmarkLayer.addTo(map);
+
+            const userIcon = L.divIcon({ html: '📍', className: 'text-3xl', iconSize: [30, 42], iconAnchor: [15, 42] });
+            const foodIcon = L.divIcon({ html: '🍔', className: 'text-2xl', iconSize: [30, 42], iconAnchor: [15, 42] });
+            const hospitalIcon = L.divIcon({ html: '🏥', className: 'text-2xl', iconSize: [30, 42], iconAnchor: [15, 42] });
+            const fuelIcon = L.divIcon({ html: '⛽️', className: 'text-2xl', iconSize: [30, 42], iconAnchor: [15, 42] });
+            const mallIcon = L.divIcon({ html: '🛍️', className: 'text-2xl', iconSize: [30, 42], iconAnchor: [15, 42] });
+            const cafeIcon = L.divIcon({ html: '☕️', className: 'text-2xl', iconSize: [30, 42], iconAnchor: [15, 42] });
+            const hotelIcon = L.divIcon({ html: '🏨', className: 'text-2xl', iconSize: [30, 42], iconAnchor: [15, 42] });
+            const groceryIcon = L.divIcon({ html: '🛒', className: 'text-2xl', iconSize: [30, 42], iconAnchor: [15, 42] });
+
+            const landmarkTypes = [
+                { type: 'food', query: 'amenity=restaurant', icon: foodIcon, defaultName: 'Restaurant' },
+                { type: 'hospital', query: 'amenity=hospital', icon: hospitalIcon, defaultName: 'Hospital' },
+                { type: 'fuel', query: 'amenity=fuel', icon: fuelIcon, defaultName: 'Petrol Pump' },
+                { type: 'mall', query: 'shop=mall', icon: mallIcon, defaultName: 'Shopping Mall' },
+                { type: 'cafe', query: 'amenity=cafe', icon: cafeIcon, defaultName: 'Cafe' },
+                { type: 'hotel', query: 'tourism=hotel', icon: hotelIcon, defaultName: 'Hotel' },
+                { type: 'grocery', query: 'shop=supermarket', icon: groceryIcon, defaultName: 'Grocery Store' }
+            ];
+
+            async function findAndMarkAllNearby(accuracy) {
+                landmarkLayer.clearLayers();
+                locationInfo.textContent = `Accurate up to ${accuracy} meters. Searching for all nearby landmarks...`;
+                
+                const allMarkers = [];
+                let totalPlacesFound = 0;
+                let searchRadius = 3000;
+
+                for (const landmark of landmarkTypes) {
+                    const data = await fetchNearbyData(landmark.query, searchRadius);
+                    if(data && data.elements.length > 0) {
+                        totalPlacesFound += data.elements.length;
+                        data.elements.forEach(element => {
+                            const name = element.tags.name || landmark.defaultName;
+                            const marker = L.marker([element.lat, element.lon], { icon: landmark.icon }).bindPopup(`<b>${name}</b>`);
+                            landmarkLayer.addLayer(marker);
+                            allMarkers.push(marker);
+                        });
+                    }
+                }
+                
+                if(totalPlacesFound === 0) {
+                    searchRadius = 7000;
+                    locationInfo.textContent = `No landmarks found nearby. Expanding search to 5km...`;
+                     for (const landmark of landmarkTypes) {
+                        const data = await fetchNearbyData(landmark.query, searchRadius);
+                        if(data && data.elements.length > 0) {
+                            totalPlacesFound += data.elements.length;
+                            data.elements.forEach(element => {
+                                const name = element.tags.name || landmark.defaultName;
+                                const marker = L.marker([element.lat, element.lon], { icon: landmark.icon }).bindPopup(`<b>${name}</b>`);
+                                landmarkLayer.addLayer(marker);
+                                allMarkers.push(marker);
+                            });
+                        }
+                    }
+                }
+
+                if (accuracy>500){location.reload()}
+                let accuracyText = `Accurate up to ${accuracy} meters.`;
+                if (totalPlacesFound > 0) {
+                    locationInfo.textContent = `${accuracyText} Found ${totalPlacesFound} landmarks within ${searchRadius/1000}km.`;
+                    if (userMarker) {
+                        allMarkers.push(userMarker);
+                    }
+                    const featureGroup = L.featureGroup(allMarkers);
+                    map.fitBounds(featureGroup.getBounds().pad(0.2));
+                } else {
+                   locationInfo.textContent = `${accuracyText} No important landmarks found within 5km.`;
+                }
+            }
+
+            async function fetchNearbyData(query, radius) {
+                const overpassUrl = `https://overpass-api.de/api/interpreter?data=[out:json];node[${query}](around:${radius},${userCoords.lat},${userCoords.lon});out;`;
+                try {
+                    const response = await fetch(overpassUrl);
+                    return await response.json();
+                } catch(error) {
+                    console.error("Overpass API Error:", error);
+                    return null;
+                }
+            }
+            
+            window.getLocation = function() {
+                locationInfo.textContent = "Requesting location...";
+                let acc = -1;
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            userCoords.lat = position.coords.latitude;
+                            userCoords.lon = position.coords.longitude;
+                            acc = position.coords.accuracy;
+                            const accuracy = Math.round(position.coords.accuracy);
+                            
+                            if (userMarker) {
+                                userMarker.setLatLng([userCoords.lat, userCoords.lon]);
+                            } else {
+                                userMarker = L.marker([userCoords.lat, userCoords.lon], { icon: userIcon }).addTo(map);
+                            }
+                            userMarker.bindPopup("<b>You are here!</b>").openPopup();
+                            
+                            findAndMarkAllNearby(accuracy);
+                        },
+                        (error) => {
+                            locationInfo.textContent = "Could not get location. Displaying default map.";
+                            console.error("Geolocation Error:", error.message);
+                        },
+                        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                    );
+                     if (acc > 200) { getLocation();}
+                } else {
+                    locationInfo.textContent = "Geolocation is not supported by your browser.";
+                }
+            };
+            
+            getLocation();
+
+            const canvas = document.getElementById('particle-canvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                let particles = [];
+                let mouse = { x: null, y: null, radius: 150 };
+                const indianAlphabets = 'أ ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ي a b c d e f g h i j k l m n o p q r s t u v w x y z';
+
+                const setCanvasSize = () => {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                };
+
+                const createParticles = () => {
+                    particles = [];
+                    const particleCount = Math.floor((canvas.width * canvas.height) / 10000);
+                    for (let i = 0; i < particleCount; i++) {
+                        const size = Math.random() * 22 + 10;
+                        particles.push({
+                            x: Math.random() * canvas.width,
+                            y: Math.random() * canvas.height,
+                            char: indianAlphabets[Math.floor(Math.random() * indianAlphabets.length)],
+                            size: size,
+                            baseVx: (Math.random() - 0.5) * 0.2,
+                            baseVy: (Math.random() - 0.5) * 0.2,
+                            vx: (Math.random() - 0.5) * 0.2,
+                            vy: (Math.random() - 0.5) * 0.2,
+                            color: `rgba(255, 255, 255, ${Math.random() * 0.4 + 0.2})`
+                        });
+                    }
+                };
+                
+                const animate = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    particles.forEach(p => {
+                        if (mouse.x && mouse.y) {
+                            const dx = p.x - mouse.x;
+                            const dy = p.y - mouse.y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            if (distance < mouse.radius) {
+                                const force = (mouse.radius - distance) / mouse.radius;
+                                p.vx += (dx / distance) * force * 0.15;
+                                p.vy += (dy / distance) * force * 0.15;
+                            }
+                        }
+                        p.vx *= 0.95;
+                        p.vy *= 0.95;
+                        p.vx += p.baseVx * 0.05;
+                        p.vy += p.baseVy * 0.05;
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        if (p.x < -p.size) p.x = canvas.width + p.size;
+                        if (p.x > canvas.width + p.size) p.x = -p.size;
+                        if (p.y < -p.size) p.y = canvas.height + p.size;
+                        if (p.y > canvas.height + p.size) p.y = -p.size;
+                        
+                        ctx.fillStyle = p.color;
+                        ctx.font = `${p.size}px Inter`;
+                        ctx.fillText(p.char, p.x, p.y);
+                    });
+                    
+                    requestAnimationFrame(animate);
+                };
+                
+                window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+                window.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
+                window.addEventListener('resize', () => { setCanvasSize(); createParticles(); });
+
+                setCanvasSize();
+                createParticles();
+                animate();
+            }
+        });
+    </script>
+</body>
+</html>
+

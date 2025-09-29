@@ -1,0 +1,46 @@
+!pip install easyocr -q
+!pip install aksharamukha -q
+
+import easyocr
+from aksharamukha import transliterate
+
+# === GLOBAL LANGUAGE VARIABLES ===
+langfrom = 'english'
+langto = 'hindi'
+
+# OCR languages mapping
+language_init = {
+    'urdu':'ur', 'hindi':'hi','marathi':'hi','nepali':'hi',
+    'telugu':'te','kannada':'kn','bengali':'bn','assamese':'bn'
+}
+
+# Script mapping for Aksharamukha
+languages = {
+    "english": "IAST",
+    "hindi": "Devanagari",
+    "marathi": "Devanagari",
+    "nepali": "Devanagari",
+    "urdu": "Arabic",
+    "telugu": "Telugu",
+    "kannada": "Kannada",
+    "bengali": "Bengali",
+    "assamese": "Bengali"
+}
+
+# === TRANSLITERATION FUNCTION ===
+def transliterate_text(text):
+    """Uses global langfrom -> langto"""
+    src_script = languages.get(langfrom.lower())
+    tgt_script = languages.get(langto.lower())
+    if not src_script or not tgt_script:
+        return "Language not supported!"
+    return transliterate.process(src_script, tgt_script, text)
+
+# === OCR READER ===
+reader = easyocr.Reader([language_init.get(langfrom, 'hi')], gpu=False)
+
+# === READ IMAGE ===
+results = reader.readtext('Untitled.jpg')
+# === TRANSLITERATE RESULTS ===
+for bbox, text, conf in results:
+    print(transliterate_text(text),text)

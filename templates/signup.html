@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bharatiya Lipi Transliteration - Sign Up</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #84fab0, #8fd3f4);
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
+            transition: background-position 0.6s ease-out; /* For JS mouse follow effect */
+            perspective: 1000px; /* Establishes a 3D space for child elements */
+        }
+
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px); /* For Safari */
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transition: transform 0.2s ease-out; /* For JS tilt effect */
+            z-index: 1; /* To appear above the canvas */
+            opacity: 0;
+            animation: fadeInSlideUp 0.8s 0.2s ease-out forwards;
+        }
+
+        @keyframes fadeInSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px); /* Animation no longer needs perspective */
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0); /* Final state is a simple translation */
+            }
+        }
+        
+        .logo-gradient {
+            background: -webkit-linear-gradient(45deg, #f97316, #ea580c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Floating Label Group */
+        .floating-label-group {
+            position: relative;
+        }
+
+        /* Base state of the label */
+        .floating-label-group .floating-label {
+            position: absolute;
+            pointer-events: none;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #4a5568;
+            transition: all 0.2s ease-out;
+            font-size: 1rem;
+        }
+
+        /* Floating (active) state - CORRECTED for cutout effect */
+        .floating-input:focus ~ .floating-label,
+        .floating-input:not(:placeholder-shown) ~ .floating-label {
+            top: 0;
+            transform: translateY(-50%);
+            left: 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #c2410c;
+            padding: 0 0.3rem; /* Horizontal padding to create the gap */
+            background: rgba(255, 255, 255, 0.5); /* Background to cover the border */
+            backdrop-filter: blur(5px);
+             -webkit-backdrop-filter: blur(5px);
+        }
+
+        /* Input field */
+        .floating-input {
+            transition: border-color 0.2s ease-out;
+        }
+
+        .floating-input:focus {
+            outline: none;
+            border: 2px solid #f97316;
+            padding: 0.75rem 0.95rem;
+        }
+        
+        /* Spinner for Gemini API call */
+        .loader {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #f97316;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen overflow-hidden">
+    <canvas id="particle-canvas"></canvas>
+    <div class="w-full max-w-md p-8 space-y-6 glass-effect shadow-2xl rounded-2xl m-4">
+        <div class="text-center">
+            <div class="flex justify-center items-center mb-4">
+                <span class="text-5xl font-bold logo-gradient mr-2" style="text-shadow: 0 1px 3px rgba(0,0,0,0.1);">अ</span>
+                <h1 class="text-3xl font-bold text-gray-900">Create an Account</h1>
+            </div>
+            <p class="text-gray-800 font-medium">Connecting India, one script at a time.</p>
+        </div>
+
+        <form class="space-y-4" id="signupForm" action="#" method="POST">
+            <div class="floating-label-group">
+                <input id="fullName" name="fullName" type="text" autocomplete="name" required placeholder=" "
+                    class="floating-input block w-full px-4 py-3 bg-white bg-opacity-50 border border-gray-300 rounded-lg">
+                <label for="fullName" class="floating-label">Full Name</label>
+            </div>
+            
+            <div class="floating-label-group">
+                <input id="email" name="email" type="email" autocomplete="email" required placeholder=" "
+                    class="floating-input block w-full px-4 py-3 bg-white bg-opacity-50 border border-gray-300 rounded-lg">
+                <label for="email" class="floating-label">Email Address</label>
+            </div>
+
+            <div>
+                <div class="relative floating-label-group">
+                     <input id="password" name="password" type="password" autocomplete="new-password" required placeholder=" "
+                        class="floating-input block w-full px-4 py-3 bg-white bg-opacity-50 border border-gray-300 rounded-lg">
+                     <label for="password" class="floating-label">Password</label>
+                     <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 px-4 flex items-center text-gray-600 hover:text-orange-600">
+                         <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>
+                         <svg id="eyeOffIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2 2 0 012.828 2.828l1.515 1.515A4 4 0 0014 10a4 4 0 10-5.432-3.432z" clip-rule="evenodd" /><path d="M10 17a9.958 9.958 0 01-4.512-1.074l-1.78-1.781a1 1 0 011.414-1.414l1.697 1.697A8.007 8.007 0 0110 15c4.478 0 8.268-2.943 9.542-7a10.014 10.014 0 00-1.745-3.032l-1.666 1.666a1 1 0 01-1.414-1.414l-1.473-1.473A10.014 10.014 0 0110 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.78-1.78a9.955 9.955 0 01-2.433 1.075z" /></svg>
+                     </button>
+                </div>
+                <div class="mt-2">
+                     <button type="button" id="suggestPasswordBtn" class="text-xs font-semibold text-orange-700 hover:text-orange-600 flex items-center gap-1">
+                         ✨ Suggest a Strong Password
+                         <span id="gemini-loader" class="loader hidden"></span>
+                     </button>
+                </div>
+                 <p id="gemini-error" class="text-xs text-red-600 mt-1 hidden"></p>
+            </div>
+
+            <div class="floating-label-group">
+                <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" required placeholder=" "
+                    class="floating-input block w-full px-4 py-3 bg-white bg-opacity-50 border border-gray-300 rounded-lg">
+                <label for="confirmPassword" class="floating-label">Confirm Password</label>
+            </div>
+            <p id="password-match-error" class="text-xs text-red-600 -mt-4 hidden">Passwords do not match.</p>
+
+            <div class="pt-4">
+                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 hover:scale-105 transform transition-all duration-300 ease-in-out">
+                    Sign Up
+                </button>
+            </div>
+        </form>
+
+        <div class="my-4 flex items-center">
+            <div class="flex-grow border-t border-gray-400"></div>
+            <span class="flex-shrink mx-4 text-sm text-gray-700">Or continue with</span>
+            <div class="flex-grow border-t border-gray-400"></div>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3">
+            <a href="#" class="w-full inline-flex justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white bg-opacity-80 text-sm font-medium text-gray-700 hover:bg-opacity-100 transform hover:scale-105 transition-all duration-300 ease-in-out"><span class="sr-only">Sign in with Google</span><svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" /><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" /><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" /><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" /></svg></a>
+            <a href="#" class="w-full inline-flex justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white bg-opacity-80 text-sm font-medium text-gray-700 hover:bg-opacity-100 transform hover:scale-105 transition-all duration-300 ease-in-out"><span class="sr-only">Sign in with Facebook</span><svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" /></svg></a>
+        </div>
+        
+        <p class="!mt-8 text-center text-sm text-gray-700">
+            Already have an account?
+            <a href="login5.html" class="font-semibold text-orange-700 hover:text-orange-600">Sign In</a>
+        </p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const card = document.querySelector('.glass-effect');
+            
+            document.body.addEventListener('mousemove', (e) => {
+                const { clientX, clientY } = e;
+                const { innerWidth, innerHeight } = window;
+                const xPercent = (clientX / innerWidth) * 100;
+                const yPercent = (clientY / innerHeight) * 100;
+                document.body.style.backgroundPosition = `${xPercent}% ${yPercent}%`;
+            });
+
+            if (card) {
+                card.addEventListener('mousemove', (e) => {
+                    const { left, top, width, height } = card.getBoundingClientRect();
+                    const x = e.clientX - left;
+                    const y = e.clientY - top;
+                    const rotateX = -((y - height / 2) / (height / 2)) * 15;
+                    const rotateY = ((x - width / 2) / (width / 2)) * 15;
+                    card.style.transform = `translateY(0) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'translateY(0) rotateX(0deg) rotateY(0deg) scale(1)';
+                });
+            }
+
+            const passwordInput = document.getElementById('password');
+            const togglePassword = document.getElementById('togglePassword');
+            const eyeIcon = document.getElementById('eyeIcon');
+            const eyeOffIcon = document.getElementById('eyeOffIcon');
+            
+            const showPassword = () => {
+                passwordInput.setAttribute('type', 'text');
+                eyeIcon.classList.add('hidden');
+                eyeOffIcon.classList.remove('hidden');
+            };
+
+            const hidePassword = () => {
+                passwordInput.setAttribute('type', 'password');
+                eyeIcon.classList.remove('hidden');
+                eyeOffIcon.classList.add('hidden');
+            };
+
+            if(togglePassword) {
+                togglePassword.addEventListener('click', () => {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    if (type === 'text') {
+                        showPassword();
+                    } else {
+                        hidePassword();
+                    }
+                });
+            }
+
+            // Using local JS password generator
+            const suggestPasswordBtn = document.getElementById('suggestPasswordBtn');
+            if(suggestPasswordBtn) {
+                suggestPasswordBtn.addEventListener('click', () => {
+                    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+                    let password = "";
+                    for (let i = 0; i < 14; i++) {
+                        password += chars.charAt(Math.floor(Math.random() * chars.length));
+                    }
+                    passwordInput.value = password;
+                    document.getElementById('confirmPassword').value = password;
+                    passwordInput.dispatchEvent(new Event('input', { bubbles: true })); 
+                    document.getElementById('confirmPassword').dispatchEvent(new Event('input', { bubbles: true }));
+                    
+                    showPassword();
+                    setTimeout(hidePassword, 2000);
+                });
+            }
+
+            const signupForm = document.getElementById('signupForm');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const passwordMatchError = document.getElementById('password-match-error');
+
+            if (signupForm) {
+                signupForm.addEventListener('submit', (e) => {
+                    if (passwordInput.value !== confirmPasswordInput.value) {
+                        e.preventDefault();
+                        passwordMatchError.classList.remove('hidden');
+                        confirmPasswordInput.classList.add('border-red-500');
+                    } else {
+                        passwordMatchError.classList.add('hidden');
+                        confirmPasswordInput.classList.remove('border-red-500');
+                        alert('Sign up successful (simulation)!');
+                    }
+                });
+            }
+
+            const canvas = document.getElementById('particle-canvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                let particles = [];
+                let mouse = {
+                    x: null,
+                    y: null,
+                    radius: 150
+                };
+                
+                const indianAlphabets = 'अआइईकखगघङचछजझञటఠడಢణதநனபமயరలవಶಷసహঅআইঈউঊঋ଑଒ઔକଖଗఘଙચછજઝઞટઠડઢણਤਥਦਧਨਪਫਬਭਮਯਰਲਵಶಷಸಹॐ';
+
+                const setCanvasSize = () => {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                };
+
+                const createParticles = () => {
+                    particles = [];
+                    const particleCount = Math.floor((canvas.width * canvas.height) / 10000);
+                    for (let i = 0; i < particleCount; i++) {
+                        const size = Math.random() * 22 + 10;
+                        particles.push({
+                            x: Math.random() * canvas.width,
+                            y: Math.random() * canvas.height,
+                            char: indianAlphabets[Math.floor(Math.random() * indianAlphabets.length)],
+                            size: size,
+                            baseVx: (Math.random() - 0.5) * 0.5,
+                            baseVy: (Math.random() - 0.5) * 0.5,
+                            vx: (Math.random() - 0.5) * 0.5,
+                            vy: (Math.random() - 0.5) * 0.5,
+                            color: `rgba(255, 255, 255, ${Math.random() * 0.4 + 0.2})`
+                        });
+                    }
+                };
+
+                const connectParticles = () => {
+                    for (let i = 0; i < particles.length; i++) {
+                        for (let j = i + 1; j < particles.length; j++) {
+                            const dx = particles[i].x - particles[j].x;
+                            const dy = particles[i].y - particles[j].y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            if (distance < 150) { 
+                                ctx.beginPath();
+                                ctx.strokeStyle = `rgba(255, 255, 255, ${1 - distance / 150})`;
+                                ctx.lineWidth = 0.3;
+                                ctx.moveTo(particles[i].x, particles[i].y);
+                                ctx.lineTo(particles[j].x, particles[j].y);
+                                ctx.stroke();
+                                ctx.closePath();
+                            }
+                        }
+                    }
+                };
+
+                const animate = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    particles.forEach(p => {
+                        if (mouse.x && mouse.y) {
+                            const dx = p.x - mouse.x;
+                            const dy = p.y - mouse.y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            if (distance < mouse.radius) {
+                                const force = (mouse.radius - distance) / mouse.radius;
+                                p.vx += (dx / distance) * force * 0.3;
+                                p.vy += (dy / distance) * force * 0.3;
+                            }
+                        }
+
+                        p.vx *= 0.95;
+                        p.vy *= 0.95;
+
+                        p.vx += p.baseVx * 0.05;
+                        p.vy += p.baseVy * 0.05;
+
+                        p.x += p.vx;
+                        p.y += p.vy;
+
+                        if (p.x < -p.size) p.x = canvas.width + p.size;
+                        if (p.x > canvas.width + p.size) p.x = -p.size;
+                        if (p.y < -p.size) p.y = canvas.height + p.size;
+                        if (p.y > canvas.height + p.size) p.y = -p.size;
+                        
+                        ctx.fillStyle = p.color;
+                        ctx.font = `${p.size}px Inter`;
+                        ctx.fillText(p.char, p.x, p.y);
+                    });
+                    
+                    connectParticles();
+                    requestAnimationFrame(animate);
+                };
+                
+                window.addEventListener('mousemove', (e) => {
+                    mouse.x = e.clientX;
+                    mouse.y = e.clientY;
+                });
+                
+                window.addEventListener('mouseout', () => {
+                    mouse.x = null;
+                    mouse.y = null;
+                });
+
+                window.addEventListener('resize', () => { setCanvasSize(); createParticles(); });
+                setCanvasSize();
+                createParticles();
+                animate();
+            }
+        });
+    </script>
+</body>
+</html>
+
