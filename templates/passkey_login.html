@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BhashaNow - Sign In with Passkey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #84fab0, #8fd3f4);
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
+        }
+        #particle-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            z-index: 1;
+        }
+        .font-brand {
+            font-family: 'Poppins', sans-serif;
+        }
+        .form-input {
+            background-color: rgba(255,255,255, 0.4);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .form-input:focus {
+            outline: none;
+            border: 1px solid #f97316;
+            background-color: rgba(255,255,255, 0.6);
+        }
+        .passkey-input {
+            font-family: monospace;
+            letter-spacing: 0.5em;
+            text-align: center;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #fff;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen overflow-hidden p-4">
+    <canvas id="particle-canvas"></canvas>
+    <div class="w-full max-w-md p-8 space-y-6 glass-effect shadow-2xl rounded-2xl m-4">
+        
+        <div class="text-center">
+            <a href="/" class="flex justify-center items-center space-x-2 mb-4">
+                    <img src="{{ url_for('static', filename='img.png') }}" alt="BhashaNow Logo" class="w-10 h-10 rounded-lg">
+                <span class="text-2xl font-bold text-gray-800 font-brand">BhashaNow</span>
+            </a>
+            <h1 class="text-3xl font-bold text-gray-900">Sign in with Passkey</h1>
+            <p class="text-gray-700 mt-2">Enter your email and one of your passkeys to continue.</p>
+        </div>
+
+        <form id="passkey-form" class="space-y-6 pt-4">
+            <div>
+                <label for="email" class="sr-only">Email Address</label>
+                <input id="email" name="email" type="email" autocomplete="email" required placeholder="Email Address"
+                    class="form-input block w-full px-4 py-3 rounded-lg">
+            </div>
+            <div>
+                <label for="passkey" class="sr-only">Passkey</label>
+                <input id="passkey" name="passkey" type="text" required placeholder="---- ---- ----" maxlength="14"
+                    class="form-input passkey-input block w-full px-4 py-3 rounded-lg">
+            </div>
+
+            <div>
+                <button type="submit" class="w-full h-12 flex items-center justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-lg font-medium text-white bg-orange-600 hover:bg-orange-700">
+                    <span class="btn-text">Sign In</span>
+                    <div class="spinner hidden"></div>
+                </button>
+            </div>
+        </form>
+        
+        <p class="!mt-8 text-center text-sm text-gray-700">
+            <a href="/login" class="font-semibold text-orange-700 hover:text-orange-600">Sign in with Email instead</a>
+        </p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const passkeyForm = document.getElementById('passkey-form');
+            const passkeyInput = document.getElementById('passkey');
+
+            // Auto-formats the passkey input
+            passkeyInput.addEventListener('input', (e) => {
+                // Convert to uppercase and remove any non-alphanumeric characters
+                let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 12);
+                
+                // Add hyphens for readability
+                if (value.length > 8) {
+                    value = value.slice(0, 4) + '-' + value.slice(4, 8) + '-' + value.slice(8);
+                } else if (value.length > 4) {
+                    value = value.slice(0, 4) + '-' + value.slice(4);
+                }
+                e.target.value = value;
+            });
+
+            passkeyForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(passkeyForm);
+                const res = await fetch('/loginpasskey', {
+                    method: 'POST',
+                    body: formData
+                });
+                if (res.redirected) window.location.href = res.url;
+            });
+
+
+            // Particle animation
+            const canvas = document.getElementById('particle-canvas');
+            if (canvas) {
+                // ... (Same particle animation script as other pages)
+                const ctx = canvas.getContext('2d');
+                let particles = [];
+                let mouse = { x: null, y: null, radius: 150 };
+                const indianAlphabets = 'أ ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ي a b c d e f g h i j k l m n o p q r s t u v w x y z';
+                const setCanvasSize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+                const createParticles = () => {
+                    particles = [];
+                    const particleCount = Math.floor((canvas.width * canvas.height) / 10000);
+                    for (let i = 0; i < particleCount; i++) {
+                        const size = Math.random() * 22 + 10;
+                        particles.push({
+                            x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+                            char: indianAlphabets[Math.floor(Math.random() * indianAlphabets.length)],
+                            size: size, baseVx: (Math.random() - 0.5) * 0.2, baseVy: (Math.random() - 0.5) * 0.2,
+                            vx: (Math.random() - 0.5) * 0.2, vy: (Math.random() - 0.5) * 0.2,
+                            color: `rgba(255, 255, 255, ${Math.random() * 0.4 + 0.2})`
+                        });
+                    }
+                };
+                const connectParticles = () => { 
+                     for (let i = 0; i < particles.length; i++) {
+                        for (let j = i + 1; j < particles.length; j++) {
+                            const dx = particles[i].x - particles[j].x;
+                            const dy = particles[i].y - particles[j].y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            if (distance < 150) { 
+                                ctx.beginPath();
+                                ctx.strokeStyle = `rgba(255, 255, 255, ${1 - distance / 150})`;
+                                ctx.lineWidth = 0.3;
+                                ctx.moveTo(particles[i].x, particles[i].y);
+                                ctx.lineTo(particles[j].x, particles[j].y);
+                                ctx.stroke();
+                                ctx.closePath();
+                            }
+                        }
+                    }
+                };
+                const animate = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    particles.forEach(p => {
+                        if (mouse.x && mouse.y) {
+                            const dx = p.x - mouse.x; const dy = p.y - mouse.y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            if (distance < mouse.radius) {
+                                const force = (mouse.radius - distance) / mouse.radius;
+                                p.vx += (dx / distance) * force * 0.3; p.vy += (dy / distance) * force * 0.3;
+                            }
+                        }
+                        p.vx *= 0.95; p.vy *= 0.95; p.vx += p.baseVx * 0.05; p.vy += p.baseVy * 0.05;
+                        p.x += p.vx; p.y += p.vy;
+                        if (p.x < -p.size) p.x = canvas.width + p.size; if (p.x > canvas.width + p.size) p.x = -p.size;
+                        if (p.y < -p.size) p.y = canvas.height + p.size; if (p.y > canvas.height + p.size) p.y = -p.size;
+                        ctx.fillStyle = p.color; ctx.font = `${p.size}px Inter`; ctx.fillText(p.char, p.x, p.y);
+                    });
+                    connectParticles();
+                    requestAnimationFrame(animate);
+                };
+                window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+                window.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
+                window.addEventListener('resize', () => { setCanvasSize(); createParticles(); });
+                setCanvasSize(); createParticles(); animate();
+            }
+        });
+    </script>
+</body>
+</html>
+

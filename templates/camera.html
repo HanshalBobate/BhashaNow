@@ -11,38 +11,149 @@
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         .glass-card { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.18); }
         .logo-gradient { background: -webkit-linear-gradient(45deg, #f97316, #ea580c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        video { transform: scaleX(-1); } /* Mirror the video feed */
+        video { transform: scaleX(1); }
+        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #f97316; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="flex flex-col items-center min-h-screen p-4">
 
     <!-- Header -->
     <header class="w-full max-w-5xl mx-auto flex justify-between items-center p-4 glass-card rounded-2xl mb-8">
-        <a href="hub.html" class="flex items-center space-x-2">
-            <span class="text-4xl font-bold logo-gradient">अ</span>
+        <a href="/hub" class="flex items-center space-x-2">
+            <img src="{{ url_for('static', filename='img.png') }}" alt="BhashaNow Logo" class="w-10 h-10 rounded-lg">
             <span class="text-2xl font-bold text-gray-800">BhashaNow - Transliteration on the Go!</span>
         </a>
-        <a href="signup.html" title="View Profile">
-            <img class="w-12 h-12 rounded-full border-2 border-orange-500 object-cover" src="https://placehold.co/100x100/f97316/FFFFFF?text=A" alt="User Avatar">
+        <a href="/signup" title="View Profile">
+            <img class="w-12 h-12 rounded-full border-2 border-orange-500 object-cover" src="https://placehold.co/100x100/f97316/FFFFFF?text={{ user.name[:1]|default('U')|capitalize }}" alt="User Avatar">
         </a>
     </header>
-
     <!-- Camera Feed and Controls -->
     <main class="w-full max-w-5xl mx-auto flex-grow flex flex-col items-center justify-center glass-card rounded-2xl p-8">
+        <div class="w-full mb-3 text-right">
+            <a href="{{ url_for('add_tokens') }}" 
+                class="text-sm font-medium {% if tokens < 10 %}text-red-600{% elif tokens < 25 %}text-yellow-600{% else %}text-green-600{% endif %}">
+                Remaining Tokens: {{ tokens }} tokens
+            </a>
+            <!-- <p class="text-sm font-medium {% if tokens < 10 %}text-red-600{% elif tokens < 25 %}text-yellow-600{% else %}text-green-600{% endif %}">
+                Remaining Tokens: {{ tokens }} tokens
+            </p> -->
+        </div>
         <div id="camera-container" class="w-full aspect-video bg-gray-900 rounded-lg overflow-hidden flex items-center justify-center">
             <video id="camera-feed" class="w-full h-full object-cover" autoplay playsinline></video>
             <p id="camera-error" class="text-white text-center p-4 hidden">Could not access camera. Please check permissions and refresh.</p>
         </div>
-        <button id="capture-btn" class="mt-6 w-full max-w-xs flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-lg font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 hover:scale-105 transform transition-all duration-300 ease-in-out">
-            Capture Image
-        </button>
+        <div class="mt-6 w-full max-w-xs flex flex-col gap-3">
+            <button id="capture-btn" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-lg font-medium text-white bg-orange-600 hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 hover:scale-105 transform transition-all duration-300 ease-in-out">
+                Capture Image
+            </button>
+            <label for="upload-input" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-lg font-medium text-white bg-orange-600 hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 hover:scale-105 transform transition-all duration-300 ease-in-out cursor-pointer">
+                Upload Image
+            </label>
+            <input type="file" id="upload-input" accept="image/*" class="hidden">
+        </div>
     </main>
+
+    <!-- Preview Modal -->
+    <div id="preview-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="glass-card rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
+            <button id="close-modal-btn"
+                onclick="location.reload()"
+                class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 hover:text-gray-900 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500"
+                title="Reload">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Image Preview & Transliteration</h2>
+            
+            <div class="mb-4 bg-gray-900 rounded-lg overflow-hidden">
+                <img id="preview-image" class="w-full h-auto" alt="Preview">
+            </div>
+
+            <form id="translation-form" class="space-y-4">
+                <div>
+                    <label for="lang-from" class="block text-sm font-medium text-gray-700 mb-2">Language From</label>
+                    <select id="lang-from" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                        <option value="english" selected>English</option>
+                        <option value="hindi">Hindi</option>
+                        <option value="marathi">Marathi</option>
+                        <option value="nepali">Nepali</option>
+                        <option value="urdu">Urdu</option>
+                        <option value="telugu">Telugu</option>
+                        <option value="kannada">Kannada</option>
+                        <option value="bengali">Bengali</option>
+                        <option value="assamese">Assamese</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="lang-to" class="block text-sm font-medium text-gray-700 mb-2">Language To</label>
+                    <select id="lang-to" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                        <option value="english">English</option>
+                        <option value="hindi" selected>Hindi</option>
+                        <option value="marathi">Marathi</option>
+                        <option value="nepali">Nepali</option>
+                        <option value="urdu">Urdu</option>
+                        <option value="telugu">Telugu</option>
+                        <option value="kannada">Kannada</option>
+                        <option value="bengali">Bengali</option>
+                        <option value="assamese">Assamese</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="submit" id="translate-btn" class="flex-1 py-3 px-4 border border-transparent rounded-lg shadow-lg text-lg font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                        Transliterate
+                    </button>
+                    <button type="button" id="cancel-btn" class="flex-1 py-3 px-4 border border-gray-300 rounded-lg shadow-lg text-lg font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+
+            <!-- Loading Spinner -->
+            <div id="loading" class="hidden flex flex-col items-center justify-center mt-4">
+                <div class="spinner"></div>
+                <p class="text-gray-700 mt-2">Processing image...</p>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results" class="hidden mt-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Original Text</label>
+                    <textarea id="original-text" readonly class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-orange-500 focus:border-transparent min-h-24" placeholder="Extracted text will appear here..."></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Transliterated Text</label>
+                    <textarea id="transliterated-text" readonly class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-orange-500 focus:border-transparent min-h-24" placeholder="Transliterated text will appear here..."></textarea>
+                </div>
+                <button type="button" id="copy-btn" class="w-full py-3 px-4 border border-transparent rounded-lg shadow-lg text-lg font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    Copy Transliterated Text
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const videoElement = document.getElementById('camera-feed');
             const errorElement = document.getElementById('camera-error');
             const captureBtn = document.getElementById('capture-btn');
+            const uploadInput = document.getElementById('upload-input');
+            const previewModal = document.getElementById('preview-modal');
+            const previewImage = document.getElementById('preview-image');
+            const translationForm = document.getElementById('translation-form');
+            const cancelBtn = document.getElementById('cancel-btn');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const originalText = document.getElementById('original-text');
+            const transliteratedText = document.getElementById('transliterated-text');
+            const copyBtn = document.getElementById('copy-btn');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+
+            let currentImageData = null;
 
             async function setupCamera() {
                 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -62,9 +173,121 @@
                 }
             }
 
+            function showPreview(imageSrc) {
+                currentImageData = imageSrc;
+                previewImage.src = imageSrc;
+                previewModal.classList.remove('hidden');
+                results.classList.add('hidden');
+                loading.classList.add('hidden');
+            }
+
+            function resetModal() {
+                previewModal.classList.add('hidden');
+                results.classList.add('hidden');
+                loading.classList.add('hidden');
+                originalText.value = '';
+                transliteratedText.value = '';
+                uploadInput.value = '';
+                currentImageData = null;
+            }
+
             captureBtn.addEventListener('click', () => {
-                // In a real app, you would capture a frame from the video here.
-                alert('Image captured! (Processing not implemented in this prototype)');
+                const canvas = document.createElement('canvas');
+                canvas.width = videoElement.videoWidth;
+                canvas.height = videoElement.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+                const imageDataUrl = canvas.toDataURL('image/png');
+                showPreview(imageDataUrl);
+            });
+
+            uploadInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        showPreview(event.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            cancelBtn.addEventListener('click', () => {
+                resetModal();
+            });
+
+            closeModalBtn.addEventListener('click', () => {
+                resetModal();
+            });
+
+            translationForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                if (!currentImageData) {
+                    alert('No image selected');
+                    return;
+                }
+
+                const langFrom = document.getElementById('lang-from').value;
+                const langTo = document.getElementById('lang-to').value;
+
+                // Show loading, hide form and results
+                translationForm.classList.add('hidden');
+                loading.classList.remove('hidden');
+                results.classList.add('hidden');
+
+                try {
+                    const response = await fetch('/process_image', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            email: "{{ user.email }}" ,
+                            image: currentImageData,
+                            langFrom: langFrom,
+                            langTo: langTo
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to process image');
+                    }
+
+                    const data = await response.json();
+
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
+                    // Display results
+                    originalText.value = data.originalText || 'No text detected';
+                    transliteratedText.value = data.transliteratedText || 'Translation failed';
+                    
+                    loading.classList.add('hidden');
+                    results.classList.remove('hidden');
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error processing image: ' + error.message);
+                    loading.classList.add('hidden');
+                    translationForm.classList.remove('hidden');
+                }
+            });
+
+            copyBtn.addEventListener('click', () => {
+                transliteratedText.select();
+                navigator.clipboard.writeText(transliteratedText.value)
+                    .then(() => {
+                        const originalText = copyBtn.textContent;
+                        copyBtn.textContent = 'Copied!';
+                        setTimeout(() => {
+                            copyBtn.textContent = originalText;
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        alert('Failed to copy text');
+                    });
             });
 
             setupCamera();

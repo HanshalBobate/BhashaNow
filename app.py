@@ -7,7 +7,12 @@ from flask_session import Session
 import os,secrets
 from twilio.rest import Client
 import sqlite3
-
+import easyocr
+from aksharamukha import transliterate
+import base64
+import io
+from PIL import Image
+import numpy as np
 
 
 app = Flask(__name__)
@@ -18,6 +23,7 @@ def clear_session_first_time():
     if not hasattr(app, 'session_cleared'):
         session.clear()
         app.session_cleared = True   # ✅ mark done
+        print("Sessions were cleared . . .")
 
 # Configure server-side session
 app.config["SESSION_PERMANENT"] = False
@@ -127,11 +133,11 @@ def login():
             return redirect(url_for("login"))
     return render_template("login5.html")
 
-@app.route("/create_account", methods=["GET", "POST"])
+@app.route("/signup", methods=["GET", "POST"])
 def create():
     if request.method == "POST":
         print("Creating User . . . ")
-        name = request.form.get("name")
+        name = request.form.get("fullName")
         email = request.form.get("email")
         password = request.form.get("password")
         confirm_password = request.form.get("confirmPassword")
@@ -147,7 +153,7 @@ def create():
 
         # Example: Save user to DB
         conn = get_db_connection()
-
+        print(name, password,email)
         conn.execute("""
             INSERT OR IGNORE INTO users (name, password, email, ri)
             VALUES (?, ?, ?, ?)
@@ -168,14 +174,20 @@ def create():
 def forgot_password_page():
     return render_template('password.html')
 
+@app.route('/login/passkeyord')
+def login_with_passkey():
+    return render_template('password.html')
+# @app.route('/password')
+# def forgot_password_page():
+#     return render_template('password.html')
+
 @app.route('/hub')
 def hub():
     if "user" not in session:
         flash("Please login first!", "warning")
         return redirect(url_for("login"))
 
-    user = session["user"]   # ✅ Access from session
-    return render_template("hub.html", user=user)
+    return render_template("hub.html", user=session["user"])
 
 @app.route('/userprofile')
 def profile_page():
@@ -183,12 +195,14 @@ def profile_page():
         flash("Please login first!", "warning")
         return redirect(url_for("login"))
 
-    user = session["user"]
-    return render_template('userprofile.html', user=user)
+    return render_template('userprofile.html', user=session["user"])
 
 @app.route('/camera')
 def camera_tool_page():
-    return render_template('camera.html')
+    if "user" not in session:
+        flash("Please login first!", "warning")
+        return redirect(url_for("login"))
+    return render_template('camera.html', user=session["user"])
 
 @app.route('/text-transliteration')
 def text_tool_page():

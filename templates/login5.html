@@ -53,12 +53,6 @@
             }
         }
         
-        .logo-gradient {
-            background: -webkit-linear-gradient(45deg, #f97316, #ea580c);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
         /* Interactive Logo Style */
         #interactive-logo {
             display: inline-block; /* Necessary for transforms */
@@ -139,7 +133,7 @@
         <div id="auth-container">
             <div class="text-center">
                 <div class="flex justify-center items-center mb-4">
-                    <span id="interactive-logo" class="text-5xl font-bold logo-gradient mr-2" style="text-shadow: 0 1px 3px rgba(0,0,0,0.1);">अ</span>
+                    <img src="{{ url_for('static', filename='img.png') }}" alt="BhashaNow Logo" class="w-10 h-10 rounded-lg">
                     <h1 class="text-3xl font-bold text-gray-900">Bharatiya Lipi</h1>
                 </div>
                 <p id="welcome-message" class="text-gray-800 font-medium">Connecting India, one script at a time.</p>
@@ -163,7 +157,7 @@
                          </button>
                     </div>
                     <div class="flex justify-between items-center mt-2">
-                         <a href="password.html" class="text-sm font-semibold text-orange-700 hover:text-orange-600">Forgot Password?</a>
+                         <a href="password" class="text-sm font-semibold text-orange-700 hover:text-orange-600">Forgot Password?</a>
                     </div>
                 </div>
 
@@ -195,7 +189,7 @@
             </div>
             
             <div class="space-y-4">
-            <button type="button" id="guest-login-btn"
+            <button type="button" id="guest-login-btn" onclick="window.location.href='/hub'"
                 class="w-full flex justify-center items-center gap-2 py-3 px-4 border border-gray-400 rounded-lg shadow-sm text-sm font-medium text-gray-800 bg-white bg-opacity-60 hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transform transition-all duration-300 ease-in-out">
 
                 <!-- 👤 Guest/User Icon -->
@@ -211,7 +205,10 @@
             
             <p class="!mt-8 text-center text-sm text-gray-700">
                 Don't have an account?
-                <a href="signup.html" class="font-semibold text-orange-700 hover:text-orange-600">Sign up</a>
+                <a href="{{ url_for('create') }}" class="font-semibold text-orange-700 hover:text-orange-600">
+                    Sign up
+                </a>
+
             </p>
         </div>
     </div>
@@ -232,54 +229,7 @@
                 }
             }
 
-            // --- Interactive Logo Logic ---
-            const logo = document.getElementById('interactive-logo');
-            if (logo) {
-                const originalChar = 'अ';
-                const otherChars = ['ক', 'ક', 'ਕ', 'அ', 'క', 'ಕ', 'അ', 'ا'];
-                let intervalId;
-                let charIndex = 0;
-
-                logo.addEventListener('mouseenter', () => {
-                    if (intervalId) clearInterval(intervalId);
-                    intervalId = setInterval(() => {
-                        logo.style.transform = 'scale(0.85)';
-                        setTimeout(() => {
-                            charIndex = (charIndex + 1) % otherChars.length;
-                            logo.textContent = otherChars[charIndex];
-                            logo.style.transform = 'scale(1)';
-                        }, 150);
-                    }, 300);
-                });
-
-                logo.addEventListener('mouseleave', () => {
-                    clearInterval(intervalId);
-                    logo.style.transform = 'scale(1)';
-                    logo.textContent = originalChar;
-                });
-            }
-
-            document.body.addEventListener('mousemove', (e) => {
-                const { clientX, clientY } = e;
-                const { innerWidth, innerHeight } = window;
-                const xPercent = (clientX / innerWidth) * 100;
-                const yPercent = (clientY / innerHeight) * 100;
-                document.body.style.backgroundPosition = `${xPercent}% ${yPercent}%`;
-            });
-
-            if (card) {
-                card.addEventListener('mousemove', (e) => {
-                    const { left, top, width, height } = card.getBoundingClientRect();
-                    const x = e.clientX - left;
-                    const y = e.clientY - top;
-                    const rotateX = -((y - height / 2) / (height / 2)) * 15;
-                    const rotateY = ((x - width / 2) / (width / 2)) * 15;
-                    card.style.transform = `translateY(0) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
-                });
-                card.addEventListener('mouseleave', () => {
-                    card.style.transform = 'translateY(0) rotateX(0deg) rotateY(0deg) scale(1)';
-                });
-            }
+            
 
             const passwordInput = document.getElementById('password');
             const togglePassword = document.getElementById('togglePassword');
@@ -343,11 +293,11 @@
                     `;
 
                     setTimeout(() => {
-                        console.log("Passkey authentication successful (simulation).");
-                        authContainer.innerHTML = originalAuthHTML;
+                        window.location.href = "/loginpasskey";
                         // Re-add event listeners since the DOM was replaced
                         reinitializeEventListeners();
                     }, 3000);
+
                 });
             }
 

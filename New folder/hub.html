@@ -29,14 +29,13 @@
              background: rgba(255, 255, 255, 0.2);
              border: 1px solid rgba(255, 255, 255, 0.1);
              transition: transform 0.3s ease-out, box-shadow 0.3s ease-out, background 0.3s ease-out;
-             position: relative;
         }
         .action-card:hover {
             background: rgba(255, 255, 255, 0.4);
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
-        .font-brand {
+         .font-brand {
             font-family: 'Poppins', sans-serif;
         }
         .sidebar-link {
@@ -45,34 +44,6 @@
         .sidebar-link:hover, .sidebar-link.active {
             background-color: rgba(255,255,255,0.2);
             padding-left: 1.25rem;
-        }
-        .token-badge {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-         /* Styling for the Get Directions button inside Leaflet popup */
-        .directions-button {
-            margin-top: 8px;
-            padding: 4px 12px;
-            background-color: #f97316; /* orange-500 */
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .directions-button:hover {
-            background-color: #ea580c; /* orange-600 */
         }
     </style>
 </head>
@@ -88,17 +59,17 @@
                     <span class="text-xl font-bold text-gray-800 font-brand">BhashaNow</span>
                 </a>
                 <nav class="mt-8 space-y-2">
-                    <a href="/hub" class="sidebar-link active flex items-center gap-3 py-2 px-4 rounded-lg text-gray-800 font-semibold">
+                    <a href="hub" class="sidebar-link active flex items-center gap-3 py-2 px-4 rounded-lg text-gray-800 font-semibold">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                         Dashboard
                     </a>
-                    <a href="/userprofile" class="sidebar-link flex items-center gap-3 py-2 px-4 rounded-lg text-gray-800 font-semibold">
+                    <a href="userprofile" class="sidebar-link flex items-center gap-3 py-2 px-4 rounded-lg text-gray-800 font-semibold">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                         Profile
                     </a>
                 </nav>
                 <div class="mt-auto">
-                    <a href="/" class="sidebar-link flex items-center gap-3 py-2 px-4 rounded-lg text-gray-800 font-semibold">
+                    <a href="logout" class="sidebar-link flex items-center gap-3 py-2 px-4 rounded-lg text-gray-800 font-semibold">
                          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                         Log Out
                     </a>
@@ -116,7 +87,7 @@
                             <h1 id="welcome-header" class="text-3xl font-bold text-gray-800">Welcome, {{user.name|capitalize }}!</h1>
                             <p id="date-display" class="text-gray-700 mt-1"></p>
                         </div>
-                        <a href="/userprofile" title="View Profile" class="md:hidden">
+                        <a href="userprofile" title="View Profile" class="md:hidden">
                             <img class="w-12 h-12 rounded-full border-2 border-orange-500 object-cover" src="https://placehold.co/100x100/f97316/FFFFFF?text=A" alt="User Avatar">
                         </a>
                     </div>
@@ -126,18 +97,14 @@
                 <section class="mt-8">
                     <h2 class="text-2xl font-semibold text-gray-800">Quick Actions</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                        <a href="/camera" class="action-card rounded-xl p-6 flex items-center gap-4">
-                            <div class="token-badge" id="camera-tokens-badge">
-                                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
-                                <span id="camera-tokens"> {{ tokens }} </span> Tokens
-                            </div>
+                        <a href="camera" class="action-card rounded-xl p-6 flex items-center gap-4">
                             <div class="bg-orange-100 p-3 rounded-full"><svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div>
                             <div>
                                 <h3 class="font-bold text-lg text-gray-800">Use Camera</h3>
                                 <p class="text-sm text-gray-700">Transliterate from an image.</p>
                             </div>
                         </a>
-                        <a href="/text-transliteration" class="action-card rounded-xl p-6 flex items-center gap-4">
+                        <a href="text-transliteration" class="action-card rounded-xl p-6 flex items-center gap-4">
                             <div class="bg-blue-100 p-3 rounded-full"><svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg></div>
                              <div>
                                 <h3 class="font-bold text-lg text-gray-800">Enter Text</h3>
@@ -169,32 +136,7 @@
                 dateDisplay.textContent = today.toLocaleDateString('en-US', options);
             }
 
-            // --- Token Display Logic ---
-            let userTokens = parseInt("{{tokens}}", 10);
-            localStorage.setItem('userTokens', userTokens);
-
-
-            const cameraTokens = document.getElementById('camera-tokens');
-            const cameraBadge = document.getElementById('camera-tokens-badge');
-
-            function updateTokenDisplay(count) {
-                cameraTokens.textContent = count;
-                cameraBadge.classList.remove('bg-green-100', 'text-green-800', 'bg-yellow-100', 'text-yellow-800', 'bg-red-100', 'text-red-800');
-
-                if (count > 50) {
-                    cameraBadge.classList.add('bg-green-100', 'text-green-800');
-                } else if (count > 15) {
-                    cameraBadge.classList.add('bg-yellow-100', 'text-yellow-800');
-                } else {
-                    cameraBadge.classList.add('bg-red-100', 'text-red-800');
-                }
-            }
-            updateTokenDisplay(userTokens);
-
-
-            // --- Leaflet Map Logic ---
             const locationInfo = document.getElementById('location-info');
-            // ... (rest of the map and particle JS is unchanged)
             let map;
             let userMarker;
             let landmarkLayer = L.layerGroup();
@@ -207,7 +149,7 @@
             }).addTo(map);
             landmarkLayer.addTo(map);
 
-           const userIcon = L.divIcon({ html: '📍', className: 'text-3xl', iconSize: [30, 42], iconAnchor: [15, 42] });
+            const userIcon = L.divIcon({ html: '📍', className: 'text-3xl', iconSize: [30, 42], iconAnchor: [15, 42] });
             const foodIcon = L.divIcon({ html: '🍔', className: 'text-2xl', iconSize: [30, 42], iconAnchor: [15, 42] });
             const hospitalIcon = L.divIcon({ html: '🏥', className: 'text-2xl', iconSize: [30, 42], iconAnchor: [15, 42] });
             const fuelIcon = L.divIcon({ html: '⛽️', className: 'text-2xl', iconSize: [30, 42], iconAnchor: [15, 42] });
@@ -226,59 +168,57 @@
                 { type: 'grocery', query: 'shop=supermarket', icon: groceryIcon, defaultName: 'Grocery Store' }
             ];
 
-          async function findAndMarkAllNearby(accuracy) {
-                landmarkLayer.clearLayers();
-                locationInfo.textContent = `Accurate up to ${accuracy} meters. Searching for all nearby landmarks...`;
-                
-                const allMarkers = [];
-                let totalPlacesFound = 0;
-                let searchRadius = 2000;
+            async function findAndMarkAllNearby(accuracy) {
+                landmarkLayer.clearLayers();
+                locationInfo.textContent = `Accurate up to ${accuracy} meters. Searching for all nearby landmarks...`;
+                
+                const allMarkers = [];
+                let totalPlacesFound = 0;
+                let searchRadius = 3000;
 
-                for (const landmark of landmarkTypes) {
-                    const data = await fetchNearbyData(landmark.query, searchRadius);
-                    if(data && data.elements.length > 0) {
-                        totalPlacesFound += data.elements.length;
-                        data.elements.forEach(element => {
-                            const name = element.tags.name || landmark.defaultName;
-                            const popupContent = `<div><b>${name}</b><br><button onclick="getDirections(${element.lat}, ${element.lon})" class="directions-button">Get Directions</button></div>`;
-                            const marker = L.marker([element.lat, element.lon], { icon: landmark.icon }).bindPopup(popupContent);
-                            landmarkLayer.addLayer(marker);
-                            allMarkers.push(marker);
-                        });
-                    }
-                }
-                
-                if(totalPlacesFound === 0) {
-                    searchRadius = 6500;
-                    locationInfo.textContent = `No landmarks found nearby. Expanding search to 6.5km...`;
-                     for (const landmark of landmarkTypes) {
-                        const data = await fetchNearbyData(landmark.query, searchRadius);
-                        if(data && data.elements.length > 0) {
-                            totalPlacesFound += data.elements.length;
-                            data.elements.forEach(element => {
-                                const name = element.tags.name || landmark.defaultName;
-                                const popupContent = `<div><b>${name}</b><br><button onclick="getDirections(${element.lat}, ${element.lon})" class="directions-button">Get Directions</button></div>`;
-                                const marker = L.marker([element.lat, element.lon], { icon: landmark.icon }).bindPopup(popupContent);
-                                landmarkLayer.addLayer(marker);
-                                allMarkers.push(marker);
-                            });
-                        }
-                    }
-                }
+                for (const landmark of landmarkTypes) {
+                    const data = await fetchNearbyData(landmark.query, searchRadius);
+                    if(data && data.elements.length > 0) {
+                        totalPlacesFound += data.elements.length;
+                        data.elements.forEach(element => {
+                            const name = element.tags.name || landmark.defaultName;
+                            const marker = L.marker([element.lat, element.lon], { icon: landmark.icon }).bindPopup(`<b>${name}</b>`);
+                            landmarkLayer.addLayer(marker);
+                            allMarkers.push(marker);
+                        });
+                    }
+                }
+                
+                if(totalPlacesFound === 0) {
+                    searchRadius = 7000;
+                    locationInfo.textContent = `No landmarks found nearby. Expanding search to 5km...`;
+                     for (const landmark of landmarkTypes) {
+                        const data = await fetchNearbyData(landmark.query, searchRadius);
+                        if(data && data.elements.length > 0) {
+                            totalPlacesFound += data.elements.length;
+                            data.elements.forEach(element => {
+                                const name = element.tags.name || landmark.defaultName;
+                                const marker = L.marker([element.lat, element.lon], { icon: landmark.icon }).bindPopup(`<b>${name}</b>`);
+                                landmarkLayer.addLayer(marker);
+                                allMarkers.push(marker);
+                            });
+                        }
+                    }
+                }
 
-                 if (accuracy>500){location.reload()}
-                let accuracyText = `Accurate up to ${accuracy} meters.`;
-                if (totalPlacesFound > 0) {
-                    locationInfo.textContent = `${accuracyText} Found ${totalPlacesFound} landmarks within ${searchRadius/1000}km.`;
-                    if (userMarker) {
-                        allMarkers.push(userMarker);
-                    }
-                    const featureGroup = L.featureGroup(allMarkers);
-                    map.fitBounds(featureGroup.getBounds().pad(0.2));
-                } else {
-                   locationInfo.textContent = `${accuracyText} No important landmarks found within 5km.`;
-                }
-            }
+                if (accuracy>500){location.reload()}
+                let accuracyText = `Accurate up to ${accuracy} meters.`;
+                if (totalPlacesFound > 0) {
+                    locationInfo.textContent = `${accuracyText} Found ${totalPlacesFound} landmarks within ${searchRadius/1000}km.`;
+                    if (userMarker) {
+                        allMarkers.push(userMarker);
+                    }
+                    const featureGroup = L.featureGroup(allMarkers);
+                    map.fitBounds(featureGroup.getBounds().pad(0.2));
+                } else {
+                   locationInfo.textContent = `${accuracyText} No important landmarks found within 5km.`;
+                }
+            }
 
             async function fetchNearbyData(query, radius) {
                 const overpassUrl = `https://overpass-api.de/api/interpreter?data=[out:json];node[${query}](around:${radius},${userCoords.lat},${userCoords.lon});out;`;
@@ -290,19 +230,16 @@
                     return null;
                 }
             }
-             window.getDirections = function(destLat, destLon) {
-                const url = `https://www.google.com/maps/dir/?api=1&origin=${userCoords.lat},${userCoords.lon}&destination=${destLat},${destLon}`;
-                window.open(url, '_blank');
-            }
             
-
             window.getLocation = function() {
                 locationInfo.textContent = "Requesting location...";
+                let acc = -1;
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
                         (position) => {
                             userCoords.lat = position.coords.latitude;
                             userCoords.lon = position.coords.longitude;
+                            acc = position.coords.accuracy;
                             const accuracy = Math.round(position.coords.accuracy);
                             
                             if (userMarker) {
@@ -315,13 +252,14 @@
                             findAndMarkAllNearby(accuracy);
                         },
                         (error) => {
+                            locationInfo.textContent = "Could not get location. Displaying default map.";
                             console.error("Geolocation Error:", error.message);
-                            getLocationByIP();
                         },
-                        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                     );
+                     if (acc > 200) { getLocation();}
                 } else {
-                   getLocationByIP();
+                    locationInfo.textContent = "Geolocation is not supported by your browser.";
                 }
             };
             
@@ -329,7 +267,6 @@
 
             const canvas = document.getElementById('particle-canvas');
             if (canvas) {
-                // ... Particle animation code is unchanged
                 const ctx = canvas.getContext('2d');
                 let particles = [];
                 let mouse = { x: null, y: null, radius: 150 };
@@ -403,3 +340,4 @@
     </script>
 </body>
 </html>
+

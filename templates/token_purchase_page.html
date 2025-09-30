@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BhashaNow - Purchase Tokens</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #84fab0, #8fd3f4);
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
+        }
+        #particle-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        .glass-bg {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        .plan-card {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease-out;
+        }
+        .plan-card:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            border-color: rgba(249, 115, 22, 0.5);
+        }
+        .plan-card.popular {
+            border-color: rgba(249, 115, 22, 0.8);
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .popular-badge {
+            background: linear-gradient(135deg, #f97316, #fb923c);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .font-brand {
+            font-family: 'Poppins', sans-serif;
+        }
+        input:focus {
+            outline: none;
+            border-color: #f97316;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+        }
+        .qr-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <canvas id="particle-canvas"></canvas>
+    
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- Header -->
+        <div class="glass-bg rounded-2xl p-6 mb-8">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <a href="/hub" class="text-gray-700 hover:text-gray-900 transition-colors">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    </a>
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-800 font-brand">Purchase Tokens</h1>
+                        <p class="text-gray-700 text-sm mt-1">Power up your transliteration experience</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Plans Section -->
+            <div class="lg:col-span-2">
+                <div class="glass-bg rounded-2xl p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Choose Your Plan</h2>
+                    
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <!-- Starter Plan -->
+                        <div class="plan-card rounded-xl p-6 relative">
+                            <div class="text-center">
+                                <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">Starter</h3>
+                                <div class="mb-4">
+                                    <span class="text-3xl font-bold text-gray-800">₹49</span>
+                                    <span class="text-gray-600 text-sm">/once</span>
+                                </div>
+                                <div class="bg-white/50 rounded-lg p-3 mb-4">
+                                    <p class="text-2xl font-bold text-orange-600">50 Tokens</p>
+                                    <p class="text-xs text-gray-600 mt-1">₹0.98 per token</p>
+                                </div>
+                                <ul class="text-left space-y-2 text-sm text-gray-700">
+                                    <li class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                        Valid for 30 days
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                        All languages
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                        Email support
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Popular Plan -->
+                        <div class="plan-card popular rounded-xl p-6 relative">
+                            <div class="popular-badge absolute -top-3 left-1/2 transform -translate-x-1/2 px-4 py-1 rounded-full text-white text-xs font-bold">
+                                MOST POPULAR
+                            </div>
+                            <div class="text-center">
+                                <div class="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">Pro</h3>
+                                <div class="mb-4">
+                                    <span class="text-3xl font-bold text-gray-800">₹149</span>
+                                    <span class="text-gray-600 text-sm">/once</span>
+                                </div>
+                                <div class="bg-white/50 rounded-lg p-3 mb-4">
+                                    <p class="text-2xl font-bold text-orange-600">200 Tokens</p>
+                                    <p class="text-xs text-gray-600 mt-1">₹0.75 per token</p>
+                                </div>
+                                <ul class="text-left space-y-2 text-sm text-gray-700">
+                                    <li class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                        Valid for 90 days
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                        All languages
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                        Priority support
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Premium Plan -->
+                        <div class="plan-card rounded-xl p-6 relative">
+                            <div class="text-center">
+                                <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">Premium</h3>
+                                <div class="mb-4">
+                                    <span class="text-3xl font-bold text-gray-800">₹349</span>
+                                    <span class="text-gray-600 text-sm">/once</span>
+                                </div>
+                                <div class="bg-white/50 rounded-lg p-3 mb-4">
+                                    <p class="text-2xl font-bold text-orange-600">500 Tokens</p>
+                                    <p class="text-xs text-gray-600 mt-1">₹0.70 per token</p>
+                                </div>
+                                <ul class="text-left space-y-2 text-sm text-gray-700">
+                                    <li class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                        Valid for 180 days
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                        All languages
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                        24/7 Premium support
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Terms and Conditions -->
+                    <div class="mt-8 bg-white/30 rounded-xl p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Important Terms & Conditions
+                        </h3>
+                        <ul class="space-y-2 text-sm text-gray-700">
+                            <li class="flex items-start gap-2">
+                                <span class="text-orange-600 font-bold mt-0.5">•</span>
+                                <span><strong>Non-Refundable:</strong> All token purchases are final and non-refundable. Please choose your plan carefully.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-orange-600 font-bold mt-0.5">•</span>
+                                <span><strong>Token Validity:</strong> Tokens expire after the specified validity period. Unused tokens cannot be carried forward or refunded.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-orange-600 font-bold mt-0.5">•</span>
+                                <span><strong>Processing Time:</strong> Token credits will be added to your account within 24 hours of payment verification. Please ensure you provide correct transaction details.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-orange-600 font-bold mt-0.5">•</span>
+                                <span><strong>One Token = One Image:</strong> Each image transliteration uses exactly 1 token. Text transliteration is unlimited and free.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-orange-600 font-bold mt-0.5">•</span>
+                                <span><strong>Non-Transferable:</strong> Tokens are tied to your account and cannot be transferred to another user.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-orange-600 font-bold mt-0.5">•</span>
+                                <span><strong>Fair Usage Policy:</strong> BhashaNow reserves the right to suspend accounts that abuse the service or engage in automated/bulk processing.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-orange-600 font-bold mt-0.5">•</span>
+                                <span><strong>Price Changes:</strong> Token prices are subject to change. Existing purchased tokens remain valid per their original terms.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-orange-600 font-bold mt-0.5">•</span>
+                                <span><strong>Payment Verification:</strong> Invalid or fraudulent transaction IDs will be rejected. Please ensure accuracy when submitting payment details.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Section -->
+            <div class="lg:col-span-1">
+                <div class="glass-bg rounded-2xl p-6 sticky top-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Complete Payment</h2>
+                    
+                    <!-- UPI QR Code -->
+                    <div class="qr-container mb-6">
+                        <p class="text-center text-sm font-semibold text-gray-700 mb-3">Scan to Pay via UPI</p>
+                        <div class="flex justify-center mb-3">
+                            <img src="{{ url_for('static', filename='QR.jpg') }}" alt="UPI QR Code" class="w-48 h-48 rounded-lg">
+                        </div>
+                        <div class="text-center">
+                            <p class="text-xs text-gray-600 mb-1">UPI ID:</p>
+                            <p class="font-mono text-sm font-bold text-gray-800 bg-gray-100 px-3 py-2 rounded-lg inline-block">hanshalbobate2006@oksbi</p>
+                        </div>
+                    </div>
+
+                    <!-- Payment Form -->
+                    <form id="paymentForm" class="space-y-4" form action="/add_tokens" method="post">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-800 mb-2">Your Email</label>
+                            <input type="email" id="userEmail" required 
+                                   class="w-full px-4 py-3 rounded-lg bg-white/50 border border-white/30 text-gray-800 placeholder-gray-500 transition-all"
+                                   placeholder="your.email@example.com">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-800 mb-2">Transaction ID / UTR</label>
+                            <input type="text" id="transactionId" required 
+                                   class="w-full px-4 py-3 rounded-lg bg-white/50 border border-white/30 text-gray-800 placeholder-gray-500 transition-all"
+                                   placeholder="Enter 12-digit UTR number">
+                            <p class="text-xs text-gray-600 mt-1">Find this in your payment app after completing the transaction</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-800 mb-2">Selected Plan</label>
+                            <select id="planSelect" required 
+                                    class="w-full px-4 py-3 rounded-lg bg-white/50 border border-white/30 text-gray-800 transition-all">
+                                <option value="">Choose a plan</option>
+                                <option value="starter">Starter - ₹49 (50 Tokens)</option>
+                                <option value="pro">Pro - ₹149 (200 Tokens)</option>
+                                <option value="premium">Premium - ₹349 (500 Tokens)</option>
+                            </select>
+                        </div>
+
+                        <div class="flex items-start gap-2 mt-4">
+                            <input type="checkbox" id="agreeTerms" required class="mt-1">
+                            <label for="agreeTerms" class="text-xs text-gray-700">
+                                I have read and agree to the Terms & Conditions. I understand that all purchases are non-refundable.
+                            </label>
+                        </div>
+
+                        <button type="submit" 
+                                class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-105 shadow-lg">
+                            Submit Payment Details
+                        </button>
+                    </form>
+
+                    <div class="mt-6 p-4 bg-blue-50/50 rounded-lg">
+                        <p class="text-xs text-gray-700 flex items-start gap-2">
+                            <svg class="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>Need help? Contact us at <strong>support@bhashanow.com</strong> or WhatsApp: <strong>+91 98765 43210</strong></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Particle Animation
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: null, y: null, radius: 150 };
+        const indianAlphabets = 'अ आ इ ई उ ऊ ए ऐ ओ औ क ख ग घ च छ ज झ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह';
+
+        const setCanvasSize = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        };
+
+        const createParticles = () => {
+            particles = [];
+            const particleCount = Math.floor((canvas.width * canvas.height) / 10000);
+            for (let i = 0; i < particleCount; i++) {
+                const size = Math.random() * 22 + 10;
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    char: indianAlphabets[Math.floor(Math.random() * indianAlphabets.length)],
+                    size: size,
+                    baseVx: (Math.random() - 0.5) * 0.2,
+                    baseVy: (Math.random() - 0.5) * 0.2,
+                    vx: (Math.random() - 0.5) * 0.2,
+                    vy: (Math.random() - 0.5) * 0.2,
+                    color: `rgba(255, 255, 255, ${Math.random() * 0.4 + 0.2})`
+                });
+            }
+        };
+        
+        const animate = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                if (mouse.x && mouse.y) {
+                    const dx = p.x - mouse.x;
+                    const dy = p.y - mouse.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < mouse.radius) {
+                        const force = (mouse.radius - distance) / mouse.radius;
+                        p.vx += (dx / distance) * force * 0.15;
+                        p.vy += (dy / distance) * force * 0.15;
+                    }
+                }
+                p.vx *= 0.95;
+                p.vy *= 0.95;
+                p.vx += p.baseVx * 0.05;
+                p.vy += p.baseVy * 0.05;
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < -p.size) p.x = canvas.width + p.size;
+                if (p.x > canvas.width + p.size) p.x = -p.size;
+                if (p.y < -p.size) p.y = canvas.height + p.size;
+                if (p.y > canvas.height + p.size) p.y = -p.size;
+                
+                ctx.fillStyle = p.color;
+                ctx.font = `${p.size}px Inter`;
+                ctx.fillText(p.char, p.x, p.y);
+            });
+            
+            requestAnimationFrame(animate);
+        };
+        
+        window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+        window.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
+        window.addEventListener('resize', () => { setCanvasSize(); createParticles(); });
+
+        setCanvasSize();
+        createParticles();
+        animate();
+
+        // Form Submission
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('userEmail').value;
+            const transactionId = document.getElementById('transactionId').value;
+            const plan = document.getElementById('planSelect').value;
+            const agreed = document.getElementById('agreeTerms').checked;
+
+            if (!agreed) {
+                alert('Please agree to the Terms & Conditions');
+                return;
+            }
+
+            if (!email || !transactionId || !plan) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            // Here you would send this data to your backend
+            console.log({
+                email: email,
+                transactionId: transactionId,
+                plan: plan
+            });
+
+            alert('Payment details submitted successfully! Your tokens will be credited within 24 hours. We will send a confirmation email to ' + email);
+            
+            // Reset form
+            this.reset();
+        });
+    </script>
+</body>
+</html>
